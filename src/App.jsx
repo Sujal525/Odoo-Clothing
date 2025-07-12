@@ -43,7 +43,6 @@ const App = () => {
               path="/cart"
               element={isAuthenticated ? <CartPage /> : <Navigate to="/" />}
             />
-            
           </Routes>
         </Layout>
       </Router>

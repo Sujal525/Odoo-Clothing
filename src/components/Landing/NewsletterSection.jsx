@@ -12,10 +12,14 @@ const NewsletterSection = () => {
   };
 
   return (
-    <Box sx={{ py: 6, px: { xs: 3, md: 12 }, textAlign: 'center', background: 'linear-gradient(to right, #a8edea, #fed6e3)' }}>
+    <Box sx={{ py: 6, px: { xs: 3, md: 12 }, textAlign: 'center', background: 'linear-gradient(to right, #c8e6c9, #dcedc8)' }}>
       <motion.div initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7 }}>
-        <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>Join our fashion community</Typography>
-        <Typography variant="body1" sx={{ mb: 4 }}>Get latest trends, exclusive offers & more</Typography>
+      <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
+        Join the ReWear Community
+      </Typography>
+      <Typography variant="body1" sx={{ mb: 4 }}>
+        Stay updated on sustainable fashion, swaps, and exclusive offers.
+      </Typography>
         <Box component="form" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} sx={{ display: 'inline-flex', gap: 2, flexWrap: 'wrap' }}>
           <TextField
             type="email" required

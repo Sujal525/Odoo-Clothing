@@ -3,16 +3,17 @@ import { Box, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
 
 const quotes = [
-  'Fashion is the armor to survive the reality of everyday life. – Bill Cunningham',
-  'Style is a way to say who you are without having to speak. – Rachel Zoe',
-  'Clothes mean nothing until someone lives in them. – Marc Jacobs'
+  'Sustainable fashion is the future—swap, don’t shop! – ReWear Community',
+  'Every swap reduces waste and builds community. – Eco Advocate',
+  'Give clothes a second life with ReWear’s swapping platform. – Green Fashionista'
 ];
 
 const QuotesSection = () => {
   return (
     <Box
       sx={{
-        background: 'linear-gradient(to right, #e0eafc, #cfdef3)',
+        // background: 'linear-gradient(to right, #e0eafc, #cfdef3)',
+        background: 'linear-gradient(to right, #c8e6c9, #dcedc8)',
         py: 6,
         px: { xs: 3, md: 12 },
         textAlign: 'center',

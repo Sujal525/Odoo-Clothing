@@ -1,5 +1,7 @@
+// https://sb.ecobnb.net/app/uploads/sites/3/2022/12/What-is-Eco-friendly-Fashion-and-Why-it-is-Important-1170x490.jpg
+
 import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, Stack } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useAuth0 } from '@auth0/auth0-react';
 
@@ -16,8 +18,7 @@ const HeroSection = () => {
       sx={{
         height: '100vh',
         position: 'relative',
-        backgroundImage:
-          'url(https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1350&q=80)',
+        backgroundImage: 'url(https://sb.ecobnb.net/app/uploads/sites/3/2022/12/What-is-Eco-friendly-Fashion-and-Why-it-is-Important-1170x490.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         color: 'white',
@@ -32,44 +33,80 @@ const HeroSection = () => {
       variants={heroVariants}
       transition={{ duration: 1 }}
     >
-      
-      {/* Hero Content */}
-      <Box
-        sx={{
-          zIndex: 2,
-          maxWidth: 600,
-          textShadow: '2px 2px 10px rgba(0,0,0,0.9)'
-        }}
-      >
-        <Typography variant="h2" sx={{ fontWeight: 'bold', mb: 2 }}>
-          Discover Your <br /> Unique Style <br /> With Our Collections
-        </Typography>
-        <Typography variant="h6" sx={{ mb: 4 }}>
-          Elevate your wardrobe with timeless fashion — crafted just for you.
-        </Typography>
-        <Button
-  variant="contained"
-  color="primary"
-  size="large"
-  sx={{ borderRadius: 3, px: 4, fontWeight: 'bold' }}
-  onClick={() =>
-    loginWithRedirect({ appState: { returnTo: '/dashboard' } })
-  }
->
-  Shop Now
-</Button>
-
-      </Box>
-
       {/* Background Overlay */}
       <Box
         sx={{
           position: 'absolute',
           inset: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+          background: 'linear-gradient(to right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4))',
           zIndex: 1
         }}
       />
+
+      {/* Hero Content */}
+      <Box
+        sx={{
+          zIndex: 2,
+          maxWidth: 700,
+          p: 3,
+          bgcolor: 'rgba(0, 0, 0, 0.3)',
+          borderRadius: 2,
+          textShadow: '3px 3px 15px rgba(0, 0, 0, 0.8)'
+        }}
+      >
+        <Typography
+          variant="h2"
+          sx={{
+            fontWeight: 'bold',
+            mb: 3,
+            fontSize: { xs: '2.5rem', md: '3.5rem' },
+            lineHeight: 1.2,
+            letterSpacing: 1
+          }}
+        >
+          ReWear: Sustainable Fashion <br /> Through Community Swaps
+        </Typography>
+        <Typography
+          variant="h5"
+          sx={{
+            mb: 4,
+            fontSize: { xs: '1.2rem', md: '1.5rem' },
+            color: 'rgba(255, 255, 255, 0.9)',
+            lineHeight: 1.4
+          }}
+        >
+          Join our community to swap gently used clothing and reduce textile waste.
+        </Typography>
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            sx={{ borderRadius: 3, px: 4, fontWeight: 'bold', backgroundColor: '#2e7d32' }}
+            onClick={() => loginWithRedirect({ appState: { returnTo: '/swap' } })}
+          >
+            Start Swapping
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            size="large"
+            sx={{ borderRadius: 3, px: 4, fontWeight: 'bold', color: 'white', borderColor: 'white' }}
+            onClick={() => loginWithRedirect({ appState: { returnTo: '/browse' } })}
+          >
+            Browse Items
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            size="large"
+            sx={{ borderRadius: 3, px: 4, fontWeight: 'bold', color: 'white', borderColor: 'white' }}
+            onClick={() => loginWithRedirect({ appState: { returnTo: '/list' } })}
+          >
+            List an Item
+          </Button>
+        </Stack>
+      </Box>
     </Box>
   );
 };
