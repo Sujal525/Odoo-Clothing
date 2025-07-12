@@ -91,6 +91,7 @@ cd OdooClothing
 ```
 1.In First Command Terminal
 cd backend
+pip install -r requirements.txt
 python app.py
 ```
 
