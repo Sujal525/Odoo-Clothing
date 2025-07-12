@@ -10,7 +10,6 @@ import {
   Card,
   CardContent,
   CardMedia,
-  CardActions,
   Button,
   CircularProgress,
   useTheme
@@ -26,12 +25,17 @@ import {
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 import { CartContext } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
 
-// Make sure Poppins is loaded globally
+// Replace with your actual backend URL
+const SOCKET_URL = "http://localhost:5000";
+
 const FONT = "'Poppins', sans-serif";
 
 export default function Dashboard() {
   const theme = useTheme();
+  const navigate = useNavigate();
   const { user, logout, getAccessTokenSilently } = useAuth0();
   const { cart } = useContext(CartContext);
 
@@ -44,8 +48,9 @@ export default function Dashboard() {
   const [purchases, setPurchases] = useState([]);
   const [swapHistory, setSwapHistory] = useState([]);
 
+  // Initial data fetch
   useEffect(() => {
-    const fetchDashboard = async () => {
+    (async () => {
       setLoading(true);
       try {
         const token = await getAccessTokenSilently();
@@ -53,13 +58,8 @@ export default function Dashboard() {
         const [pr, it, og, cp, pu] = await Promise.all([
           axios.get(`/api/users/${user.sub}/profile`, { headers }),
           axios.get(`/api/items?owner=${user.sub}`, { headers }),
-          axios.get(
-            `/api/swaps?user=${user.sub}&status=pending,in_progress`,
-            { headers }
-          ),
-          axios.get(`/api/swaps?user=${user.sub}&status=completed`, {
-            headers
-          }),
+          axios.get(`/api/swaps?user=${user.sub}&status=pending,in_progress`, { headers }),
+          axios.get(`/api/swaps?user=${user.sub}&status=completed`, { headers }),
           axios.get(`/api/purchases?user=${user.sub}`, { headers })
         ]);
 
@@ -69,43 +69,48 @@ export default function Dashboard() {
         setCompletedSwaps(cp.data.swaps || []);
         setPurchases(pu.data.purchases || []);
 
-        // simulate 5-day history
+        // build 5-day swap history
         const today = new Date();
         const hist = Array.from({ length: 5 }).map((_, i) => {
           const d = new Date(today);
           d.setDate(today.getDate() - (4 - i));
           return {
-            date: d.toLocaleDateString(undefined, {
-              month: "short",
-              day: "numeric"
-            }),
+            date: d.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
             swaps: Math.floor(Math.random() * 5)
           };
         });
         setSwapHistory(hist);
-      } catch (e) {
-        console.error(e);
+      } catch (err) {
+        console.error("Dashboard fetch error:", err);
       } finally {
         setLoading(false);
       }
-    };
-    fetchDashboard();
+    })();
   }, [user, getAccessTokenSilently]);
 
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          height: "80vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }}
-      >
-        <CircularProgress size={64} thickness={5} color="success" />
-      </Box>
-    );
-  }
+  // Socket listener (no conditions, prepend every received item)
+  useEffect(() => {
+    const socket = io(SOCKET_URL);
+
+    socket.on("item_uploaded_broadcast", (item) => {
+      console.log("📥 Received via socket (no filter):", item);
+      // Normalize array field if needed:
+      if (item.images && !item.imageUrls) {
+        item.imageUrls = item.images;
+      }
+      // Prepend to the listing array:
+      setMyItems(prev => [item, ...prev]);
+    });
+
+    return () => {
+      socket.off("item_uploaded_broadcast");
+      socket.disconnect();
+    };
+  }, []); // run once
+
+  const TabPanel = ({ idx, children }) => (
+    tabIndex === idx ? <Box sx={{ mt: 4 }}>{children}</Box> : null
+  );
 
   const stats = [
     { label: "Items Listed", value: myItems.length },
@@ -115,8 +120,13 @@ export default function Dashboard() {
     { label: "Points", value: profile.points }
   ];
 
-  const TabPanel = ({ idx, children }) =>
-    tabIndex === idx && <Box sx={{ mt: 4 }}>{children}</Box>;
+  if (loading) {
+    return (
+      <Box sx={{ height: "80vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <CircularProgress size={64} thickness={5} color="success" />
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -127,7 +137,7 @@ export default function Dashboard() {
         fontFamily: FONT
       }}
     >
-      {/* Hero Card */}
+      {/* === Header Card === */}
       <Card
         sx={{
           position: "relative",
@@ -140,46 +150,14 @@ export default function Dashboard() {
           mb: 5
         }}
       >
-        {/* Buttons Top‑Right */}
-        <Box
-          sx={{
-            position: "absolute",
-            top: 16,
-            right: 16,
-            display: "flex",
-            gap: 1
-          }}
-        >
-          <Button
-            variant="contained"
-            color="success"
-            sx={{
-              fontFamily: FONT,
-              "&:hover": {
-                boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
-                transform: "translateY(-2px)"
-              }
-            }}
-            onClick={() => window.location.assign("/add-item")}
-          >
+        <Box sx={{ position: "absolute", top: 16, right: 16, display: "flex", gap: 1 }}>
+          <Button variant="contained" color="success" onClick={() => navigate("/add-item")}>
             List New Item
           </Button>
-          <Button
-            variant="outlined"
-            color="success"
-            sx={{
-              fontFamily: FONT,
-              "&:hover": {
-                background: "rgba(76,175,80,0.08)",
-                transform: "translateY(-2px)"
-              }
-            }}
-            onClick={() => logout({ returnTo: window.location.origin })}
-          >
+          <Button variant="outlined" color="success" onClick={() => logout({ returnTo: window.location.origin })}>
             Logout
           </Button>
         </Box>
-
         <Avatar
           src={profile.avatar || user.picture}
           sx={{
@@ -191,58 +169,28 @@ export default function Dashboard() {
           }}
         />
         <Box sx={{ flex: 1 }}>
-          <Typography
-            variant="h4"
-            color="success.dark"
-            sx={{ mb: 1, fontFamily: FONT }}
-          >
+          <Typography variant="h4" color="success.dark" sx={{ mb: 1 }}>
             {user.name}
           </Typography>
-          <Typography
-            variant="body1"
-            color="text.secondary"
-            sx={{ mb: 2, fontFamily: FONT }}
-          >
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
             {user.email}
           </Typography>
-
-          <Typography
-            variant="subtitle2"
-            color="text.secondary"
-            sx={{ mb: 1, fontFamily: FONT }}
-          >
+          <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
             Swap Activity (Last 5 Days)
           </Typography>
           <ResponsiveContainer width="100%" height={60}>
             <LineChart data={swapHistory}>
               <XAxis dataKey="date" hide />
               <YAxis hide />
-              <Tooltip
-                contentStyle={{ borderRadius: 8 }}
-                formatter={(v) => [`${v}`, "Swaps"]}
-              />
-              <Line
-                type="monotone"
-                dataKey="swaps"
-                stroke={theme.palette.success.main}
-                strokeWidth={3}
-                dot={{ r: 3 }}
-              />
+              <Tooltip contentStyle={{ borderRadius: 8 }} formatter={(v) => [`${v}`, "Swaps"]} />
+              <Line type="monotone" dataKey="swaps" stroke={theme.palette.success.main} strokeWidth={3} dot={{ r: 3 }} />
             </LineChart>
           </ResponsiveContainer>
         </Box>
       </Card>
 
-      {/* Stats Carousel */}
-      <Box
-        sx={{
-          display: "flex",
-          overflowX: "auto",
-          gap: 2,
-          mb: 5,
-          py: 1
-        }}
-      >
+      {/* === Stats Row === */}
+      <Box sx={{ display: "flex", overflowX: "auto", gap: 2, mb: 5, py: 1 }}>
         {stats.map((s) => (
           <Card
             key={s.label}
@@ -253,34 +201,20 @@ export default function Dashboard() {
               textAlign: "center",
               borderRadius: 3,
               background: "#fff",
-              boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
-              transition: "transform 0.2s, box-shadow 0.2s",
-              "&:hover": {
-                transform: "scale(1.05)",
-                boxShadow: "0 12px 24px rgba(0,0,0,0.15)"
-              }
+              boxShadow: "0 6px 18px rgba(0,0,0,0.08)"
             }}
           >
-            <Typography
-              variant="h5"
-              color="success.dark"
-              fontWeight={700}
-              sx={{ fontFamily: FONT }}
-            >
+            <Typography variant="h5" color="success.dark" fontWeight={700}>
               {s.value}
             </Typography>
-            <Typography
-              variant="subtitle2"
-              color="text.secondary"
-              sx={{ fontFamily: FONT }}
-            >
+            <Typography variant="subtitle2" color="text.secondary">
               {s.label}
             </Typography>
           </Card>
         ))}
       </Box>
 
-      {/* Tabs */}
+      {/* === Tabs === */}
       <Tabs
         value={tabIndex}
         onChange={(_, v) => setTabIndex(v)}
@@ -293,13 +227,8 @@ export default function Dashboard() {
             textTransform: "none",
             fontWeight: 700,
             mx: 1,
-            fontFamily: FONT,
             position: "relative",
             paddingBottom: 1.5,
-            "&:hover::after": {
-              width: "100%",
-              opacity: 1
-            },
             "&::after": {
               content: '""',
               position: "absolute",
@@ -308,14 +237,12 @@ export default function Dashboard() {
               width: 0,
               height: 3,
               bgcolor: theme.palette.success.main,
-              transition: "width 0.3s ease, opacity 0.3s ease",
+              transition: "width 0.3s ease, opacity: 0.3s ease",
               opacity: 0
-            }
+            },
+            "&:hover::after": { width: "100%", opacity: 1 }
           },
-          "& .Mui-selected::after": {
-            width: "100%",
-            opacity: 1
-          }
+          "& .Mui-selected::after": { width: "100%", opacity: 1 }
         }}
       >
         <Tab label="My Listings" />
@@ -324,18 +251,50 @@ export default function Dashboard() {
         <Tab label="My Purchases" />
       </Tabs>
 
-      {/* Panels */}
+      {/* === Tab Panels === */}
       <TabPanel idx={0}>
-        {/* My Listings cards with hover… */}
+        {myItems.length === 0 ? (
+          <Typography>No listings yet. Upload something!</Typography>
+        ) : (
+          <Grid container spacing={3}>
+            {myItems.map((item, idx) => (
+              <Grid item xs={12} sm={6} md={4} key={idx}>
+                <Card sx={{ background: "#fff", borderRadius: 3 }}>
+                  <CardMedia
+                    component="img"
+                    image={item.imageUrls?.[0] || "https://via.placeholder.com/150"}
+                    height="200"
+                    alt={item.name}
+                  />
+                  <CardContent>
+                    <Typography variant="h6" fontWeight="bold">
+                      {item.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {item.description}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      Type: {item.clothType} | Fabric: {item.fabricType}
+                    </Typography>
+                    <Typography variant="body2">
+                      Size: {item.size} | Condition: {item.condition}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
       </TabPanel>
+
       <TabPanel idx={1}>
-        {/* Ongoing Swaps cards with hover… */}
+        <Typography>Ongoing swaps coming soon...</Typography>
       </TabPanel>
       <TabPanel idx={2}>
-        {/* Completed Swaps cards with hover… */}
+        <Typography>Completed swaps will show here.</Typography>
       </TabPanel>
       <TabPanel idx={3}>
-        {/* My Purchases cards with hover… */}
+        <Typography>Your purchases history will be shown here.</Typography>
       </TabPanel>
     </Box>
   );

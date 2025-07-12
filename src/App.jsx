@@ -6,13 +6,15 @@ import CartPage from './components/CartPage';
 import { useAuth0 } from '@auth0/auth0-react';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/Common/Navbar';
+import ItemList from './components/ItemList';
+import ItemDetailPage from './components/ItemDetailPage'; // ✅ Import the detail page
+import UploadClothingPage from './components/UploadClothingPage';
 
 
-
-// Wrapper component to decide when to show Navbar
+// Wrapper component to conditionally show Navbar
 const Layout = ({ children }) => {
   const location = useLocation();
-  const noNavbarPaths = ['/', '/login', '/signup']; // Add auth paths here if any
+  const noNavbarPaths = ['/', '/login', '/signup'];
 
   const showNavbar = !noNavbarPaths.includes(location.pathname);
 
@@ -43,6 +45,10 @@ const App = () => {
               path="/cart"
               element={isAuthenticated ? <CartPage /> : <Navigate to="/" />}
             />
+            <Route path="/items" element={<ItemList />} />
+            <Route path="/items/:id" element={<ItemDetailPage />} /> {/* ✅ Add Detail Page Route */}
+            <Route path="/add-item" element={<UploadClothingPage />} /> {/* ✅ This route is required */}
+
           </Routes>
         </Layout>
       </Router>

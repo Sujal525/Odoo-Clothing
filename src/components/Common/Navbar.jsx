@@ -35,9 +35,8 @@ function HideOnScroll(props) {
 // Add a Browse link to hit ItemDetail (replace `1` with a real id as needed)
 const links = [
   { label: 'Dashboard', path: '/dashboard', icon: <StorefrontIcon /> },
-  { label: 'Browse Item', path: '/items/1', icon: <SearchIcon /> },
+  { label: 'Browse Items', path: '/items', icon: <SearchIcon /> },
   { label: 'Cart', path: '/cart', icon: <ShoppingCartIcon /> },
-  { label: 'AI Stylist', path: '/stylist', icon: <SmartToyIcon /> },
 ];
 
 // Base typography/link font
