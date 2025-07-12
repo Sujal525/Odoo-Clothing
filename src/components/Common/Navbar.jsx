@@ -1,85 +1,70 @@
 // src/components/Common/Navbar.jsx
 import React, { useState } from 'react';
 import {
-  AppBar, Toolbar, Box, Slide, useScrollTrigger,
-  IconButton, Drawer, List, ListItem, ListItemIcon, ListItemText, ListItemButton, Divider
+  AppBar,
+  Toolbar,
+  Box,
+  Slide,
+  useScrollTrigger,
+  IconButton,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider
 } from '@mui/material';
 import { NavLink, useNavigate } from 'react-router-dom';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
+import SearchIcon from '@mui/icons-material/Search';
 import MenuIcon from '@mui/icons-material/Menu';
 
+// Slide hide on scroll helper
 function HideOnScroll(props) {
-  const { children } = props;
   const trigger = useScrollTrigger();
   return (
     <Slide appear={false} direction="down" in={!trigger}>
-      {children}
+      {props.children}
     </Slide>
   );
 }
 
+// Add a Browse link to hit ItemDetail (replace `1` with a real id as needed)
+const links = [
+  { label: 'Dashboard', path: '/dashboard', icon: <StorefrontIcon /> },
+  { label: 'Browse Item', path: '/items/1', icon: <SearchIcon /> },
+  { label: 'Cart', path: '/cart', icon: <ShoppingCartIcon /> },
+  { label: 'AI Stylist', path: '/stylist', icon: <SmartToyIcon /> },
+];
+
+// Base typography/link font
+const FONT = "'Poppins', sans-serif";
+
 const Navbar = () => {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const toggleDrawer = () => setMobileOpen(!mobileOpen);
 
-  const toggleDrawer = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
-  const links = [
-    { label: 'Dashboard', path: '/dashboard', icon: <StorefrontIcon /> },
-    { label: 'Cart', path: '/cart', icon: <ShoppingCartIcon /> },
-    { label: 'AI Stylist', path: '/stylist', icon: <SmartToyIcon /> },
-  ];
-
-  const baseLinkStyles = {
-    textDecoration: 'none',
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: '1rem',
-    padding: '0 1.2rem',
-    position: 'relative',
-    letterSpacing: '0.1em',
-    textTransform: 'uppercase',
-    transition: 'all 0.3s ease-in-out',
-    fontFamily: `'Poppins', 'Montserrat', sans-serif`,
-    cursor: 'pointer',
-  };
-
-  const activeLinkStyles = {
-    color: '#FFD700',
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      bottom: -5,
-      left: 0,
-      width: '100%',
-      height: 3,
-      background: '#FFD700',
-      borderRadius: 3,
-      animation: 'underlineSlide 0.4s ease-in-out forwards',
-      boxShadow: '0 0 6px #FFD700',
-    },
-  };
-
+  // Drawer for mobile
   const drawer = (
-    <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer}>
+    <Box sx={{ width: 250 }} onClick={toggleDrawer}>
       <List>
         {links.map(({ label, path, icon }) => (
           <ListItem key={path} disablePadding>
-            <NavLink
-              to={path}
-              style={({ isActive }) =>
-                isActive
-                  ? { ...baseLinkStyles, color: '#FFD700', width: '100%' }
-                  : { ...baseLinkStyles, color: '#000', width: '100%' }
-              }
-            >
+            <NavLink to={path} style={{ textDecoration: 'none', width: '100%' }}>
               <ListItemButton>
-                <ListItemIcon sx={{ color: 'inherit' }}>{icon}</ListItemIcon>
-                <ListItemText primary={label} />
+                <ListItemIcon sx={{ color: '#388E3C' }}>{icon}</ListItemIcon>
+                <ListItemText
+                  primary={label}
+                  primaryTypographyProps={{
+                    fontFamily: FONT,
+                    fontWeight: 600,
+                    color: '#388E3C'
+                  }}
+                />
               </ListItemButton>
             </NavLink>
           </ListItem>
@@ -94,69 +79,97 @@ const Navbar = () => {
       <HideOnScroll>
         <AppBar
           position="sticky"
-          elevation={10}
+          elevation={8}
           sx={{
-            backgroundImage: `url('https://www.transparenttextures.com/patterns/denim.png')`,
-            backgroundRepeat: 'repeat',
-            backgroundSize: 'contain',
+            backgroundImage: `url('https://www.transparenttextures.com/patterns/leafy-green.png')`,
+            backgroundColor: '#2E7D32',
             px: { xs: 2, sm: 6 },
             py: 1,
-            boxShadow: '0 6px 15px rgba(0,0,0,0.4)',
-            borderBottom: '2px solid #FFD700',
-            zIndex: 1200,
+            borderBottom: '3px solid #FFD700',
+            boxShadow: '0 6px 18px rgba(0,0,0,0.3)'
           }}
         >
-          <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', userSelect: 'none' }}>
+          <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {/* Logo */}
             <Box
               onClick={() => navigate('/dashboard')}
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                color: 'white',
-                fontWeight: '900',
-                fontSize: { xs: '1.4rem', sm: '1.9rem' },
-                letterSpacing: '0.15em',
-                fontFamily: `'Poppins', sans-serif`,
+                color: '#FFF',
+                fontWeight: 900,
+                fontSize: { xs: '1.4rem', sm: '1.8rem' },
+                letterSpacing: '0.1em',
+                fontFamily: FONT,
                 cursor: 'pointer',
-                transition: 'transform 0.4s ease',
+                transition: 'color 0.3s, transform 0.3s',
                 '&:hover': {
                   color: '#FFD700',
-                  transform: 'scale(1.12) rotate(-5deg)',
-                  textShadow: '0 0 12px #FFD700',
-                },
+                  transform: 'scale(1.05)',
+                  textShadow: '0 0 8px #FFD700'
+                }
               }}
             >
               <StorefrontIcon
                 sx={{
                   mr: 1,
-                  fontSize: { xs: 26, sm: 32 },
-                  animation: 'iconBounce 2.5s infinite ease-in-out',
-                  filter: 'drop-shadow(0 0 4px #FFD700)',
+                  fontSize: { xs: 28, sm: 34 },
+                  filter: 'drop-shadow(0 0 4px #FFD700)'
                 }}
               />
               TrendThreads
             </Box>
 
-            <Box component="nav" sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2 }}>
+            {/* Desktop Links */}
+            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 3 }}>
               {links.map(({ label, path, icon }) => (
-                <NavLink
-                  key={path}
+                <Box
+                  component={NavLink}
                   to={path}
-                  style={({ isActive }) =>
-                    isActive ? { ...baseLinkStyles, ...activeLinkStyles } : baseLinkStyles
-                  }
-                  className="nav-link"
+                  key={path}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    textDecoration: 'none',
+                    color: '#FFF',
+                    fontFamily: FONT,
+                    fontWeight: 600,
+                    letterSpacing: '0.05em',
+                    px: 1.5,
+                    py: 0.5,
+                    position: 'relative',
+                    transition: 'color 0.3s',
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      bottom: -4,
+                      left: 0,
+                      width: 0,
+                      height: 3,
+                      bgcolor: '#FFD700',
+                      borderRadius: 2,
+                      transition: 'width 0.3s'
+                    },
+                    '&:hover': {
+                      color: '#FFD700',
+                      '&::after': { width: '100%' }
+                    },
+                    '&.active': {
+                      color: '#FFD700',
+                      '&::after': { width: '100%' }
+                    }
+                  }}
                 >
-                  <Box component="span" sx={{ mr: 0.6, verticalAlign: 'middle' }}>{icon}</Box>
+                  <Box sx={{ mr: 0.6 }}>{icon}</Box>
                   {label}
-                </NavLink>
+                </Box>
               ))}
             </Box>
 
+            {/* Mobile menu icon */}
             <IconButton
               edge="end"
               color="inherit"
-              aria-label="menu"
               sx={{ display: { xs: 'block', md: 'none' } }}
               onClick={toggleDrawer}
             >
@@ -169,41 +182,6 @@ const Navbar = () => {
       <Drawer anchor="right" open={mobileOpen} onClose={toggleDrawer}>
         {drawer}
       </Drawer>
-
-      <style>{`
-        @keyframes underlineSlide {
-          0% { width: 0; opacity: 0; }
-          100% { width: 100%; opacity: 1; }
-        }
-
-        @keyframes iconBounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-4px); }
-        }
-
-        .nav-link:hover {
-          color: #FFD700 !important;
-          text-shadow: 0 0 10px #FFD700;
-          transform: scale(1.1);
-          transition: all 0.3s ease-in-out;
-        }
-
-        .nav-link::after {
-          content: '';
-          position: absolute;
-          bottom: -5px;
-          left: 0;
-          width: 0;
-          height: 3px;
-          background-color: #FFD700;
-          border-radius: 3px;
-          transition: width 0.3s ease;
-        }
-
-        .nav-link:hover::after {
-          width: 100%;
-        }
-      `}</style>
     </>
   );
 };
