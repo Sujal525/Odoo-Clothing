@@ -28,8 +28,7 @@ import { CartContext } from '../context/CartContext';
 import axios from 'axios';
 import { useAuth0 } from '@auth0/auth0-react';
 import PurchaseHistory from './PurchaseHistory';
-import ClearAllIcon from '@mui/icons-material/ClearAll'; // add this icon
-
+import ClearAllIcon from '@mui/icons-material/ClearAll';
 
 const availablePromoCodes = [
   { code: 'SUMMER25', description: '25% off summer sale', discount: 0.25 },
@@ -49,9 +48,8 @@ const CartPage = () => {
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [refreshHistory, setRefreshHistory] = useState(false);
 
- const handlePromoApply = () => {
+  const handlePromoApply = () => {
     const promo = availablePromoCodes.find(p => p.code.toLowerCase() === promoCode.trim().toLowerCase());
-
     if (!promo) {
       setSnack({ open: true, message: 'Invalid promo code!', severity: 'error' });
       setDiscount(0);
@@ -69,6 +67,7 @@ const CartPage = () => {
       setSnack({ open: true, message: `Promo code ${promo.code} applied!`, severity: 'success' });
     }
   };
+
   const handlePlaceOrder = async () => {
     if (!user?.sub) {
       setSnack({ open: true, message: 'You must be logged in to place an order.', severity: 'warning' });
@@ -76,12 +75,23 @@ const CartPage = () => {
     }
 
     try {
+      // Ensure productId is always present and valid
+      const validItems = cart.map(item => ({
+        productId: item.productId,
+        title: item.title,
+        price: item.price,
+        image: item.image,
+        quantity: item.quantity,
+      }));
+
       const orderData = {
-        items: cart,
+        items: validItems,
         totalAmount: total,
         discount,
         promoCode: promoApplied?.code || '',
       };
+
+      console.log("Sending order data:", orderData);
 
       await axios.post(`http://localhost:5000/api/orders/${user.sub}`, orderData);
 
@@ -95,7 +105,7 @@ const CartPage = () => {
     }
   };
 
-   const handleClearHistory = async () => {
+  const handleClearHistory = async () => {
     if (!user?.sub) {
       setSnack({ open: true, message: 'You must be logged in to clear history.', severity: 'warning' });
       return;
@@ -104,14 +114,12 @@ const CartPage = () => {
     try {
       await axios.delete(`http://localhost:5000/api/orders/${user.sub}`);
       setSnack({ open: true, message: 'Purchase history cleared!', severity: 'success' });
-      setRefreshHistory(prev => !prev); // refresh the history
+      setRefreshHistory(prev => !prev);
     } catch (err) {
       console.error('Failed to clear history:', err);
       setSnack({ open: true, message: 'Failed to clear purchase history.', severity: 'error' });
     }
   };
-
-
 
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const discountAmount = subtotal * discount;
@@ -181,7 +189,7 @@ const CartPage = () => {
               </Stack>
             </Paper>
 
-            {/* Promo Codes List */}
+            {/* Promo Codes */}
             <Paper sx={{ mt: 4, p: 3 }}>
               <Typography variant="h6" gutterBottom>
                 Available Promo Codes
@@ -199,11 +207,9 @@ const CartPage = () => {
               </List>
             </Paper>
 
-            {/* FAQ or Help Section */}
+            {/* FAQ */}
             <Paper sx={{ mt: 4, p: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                Frequently Asked Questions
-              </Typography>
+              <Typography variant="h6" gutterBottom>Frequently Asked Questions</Typography>
               <Divider sx={{ mb: 2 }} />
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -211,7 +217,7 @@ const CartPage = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                   <Typography>
-                    Enter a valid promo code in the box on the right and click "Apply". If valid, the discount will be applied to your order.
+                    Enter a valid promo code and click "Apply". If valid, the discount will be applied.
                   </Typography>
                 </AccordionDetails>
               </Accordion>
@@ -220,9 +226,7 @@ const CartPage = () => {
                   <Typography>Can I remove items from the cart?</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Typography>
-                    Yes! Click the red trash icon next to the item you want to remove.
-                  </Typography>
+                  <Typography>Yes, click the red trash icon next to the item.</Typography>
                 </AccordionDetails>
               </Accordion>
             </Paper>
@@ -231,9 +235,7 @@ const CartPage = () => {
           {/* Order Summary */}
           <Grid item xs={12} md={5}>
             <Paper sx={{ p: 3, position: 'sticky', top: 16 }}>
-              <Typography variant="h6" gutterBottom>
-                Order Summary
-              </Typography>
+              <Typography variant="h6" gutterBottom>Order Summary</Typography>
               <Divider sx={{ mb: 2 }} />
               <Box sx={{ mb: 2 }}>
                 <Typography>Subtotal: ₹{subtotal.toFixed(2)}</Typography>
@@ -242,9 +244,7 @@ const CartPage = () => {
                     Discount ({(discount * 100).toFixed(0)}%): -₹{discountAmount.toFixed(2)}
                   </Typography>
                 )}
-                <Typography variant="h6" mt={1}>
-                  Total: ₹{total.toFixed(2)}
-                </Typography>
+                <Typography variant="h6" mt={1}>Total: ₹{total.toFixed(2)}</Typography>
               </Box>
 
               <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
@@ -280,7 +280,7 @@ const CartPage = () => {
         </Grid>
       )}
 
-       {/* Purchase History Section */}
+      {/* Purchase History */}
       <Box sx={{ mt: 6 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h5">Purchase History</Typography>

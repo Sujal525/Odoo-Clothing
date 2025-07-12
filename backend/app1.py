@@ -123,5 +123,13 @@ def get_purchases():
     filtered = [p for p in PURCHASES if p["user"] == user] if user else PURCHASES
     return jsonify({"purchases": filtered})
 
+@app.route("/api/items/<int:item_id>", methods=["GET"])
+def get_single_item(item_id):
+    item = next((item for item in PRODUCTS if item["id"] == item_id), None)
+    if item:
+        return jsonify(item)
+    return jsonify({"error": "Item not found"}), 404
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5002)
