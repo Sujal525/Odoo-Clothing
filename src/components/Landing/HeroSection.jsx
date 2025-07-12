@@ -83,7 +83,7 @@ const HeroSection = () => {
             color="primary"
             size="large"
             sx={{ borderRadius: 3, px: 4, fontWeight: 'bold', backgroundColor: '#2e7d32' }}
-            onClick={() => loginWithRedirect({ appState: { returnTo: '/swap' } })}
+            onClick={() => loginWithRedirect({ appState: { returnTo: '/dashboard' } })}
           >
             Start Swapping
           </Button>
@@ -92,7 +92,7 @@ const HeroSection = () => {
             color="primary"
             size="large"
             sx={{ borderRadius: 3, px: 4, fontWeight: 'bold', color: 'white', borderColor: 'white' }}
-            onClick={() => loginWithRedirect({ appState: { returnTo: '/browse' } })}
+            onClick={() => loginWithRedirect({ appState: { returnTo: '/dashboard' } })}
           >
             Browse Items
           </Button>
@@ -101,7 +101,7 @@ const HeroSection = () => {
             color="primary"
             size="large"
             sx={{ borderRadius: 3, px: 4, fontWeight: 'bold', color: 'white', borderColor: 'white' }}
-            onClick={() => loginWithRedirect({ appState: { returnTo: '/list' } })}
+            onClick={() => loginWithRedirect({ appState: { returnTo: '/dashboard' } })}
           >
             List an Item
           </Button>
