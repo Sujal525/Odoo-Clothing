@@ -5,7 +5,7 @@ import requests
 import random
 from datetime import datetime, timedelta
 
-app = Flask(__name__)
+app = Flask(_name_)
 CORS(app)
 
 USER_IDS = ["auth0|user123", "auth0|user456"]
@@ -123,13 +123,5 @@ def get_purchases():
     filtered = [p for p in PURCHASES if p["user"] == user] if user else PURCHASES
     return jsonify({"purchases": filtered})
 
-@app.route("/api/items/<int:item_id>", methods=["GET"])
-def get_single_item(item_id):
-    item = next((item for item in PRODUCTS if item["id"] == item_id), None)
-    if item:
-        return jsonify(item)
-    return jsonify({"error": "Item not found"}), 404
-
-
-if __name__ == "__main__":
+if _name_ == "__main__":
     app.run(debug=True, port=5002)
