@@ -140,6 +140,7 @@ REACT_APP_AUTH0_CLIENT_ID=<your_auth0_client_id>
 - Admin panel for inventory management
 - User feedback & rating system
 - Email confirmation after order placement
+- AI integration for Quality Of Clothes
 
 ---
 
@@ -152,7 +153,7 @@ We welcome contributions! Fork the repo, create a new branch, and submit a pull 
 ## 🧑‍💻 Developed By
 
 - 👨‍💻 Devang Chudasama
-- 👨‍💻 [Your Teammate’s Name]
+- 👨‍💻 Sujal Dhruve
 
 ---
 
