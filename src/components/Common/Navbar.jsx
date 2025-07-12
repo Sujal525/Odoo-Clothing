@@ -117,7 +117,7 @@ const Navbar = () => {
                   filter: 'drop-shadow(0 0 4px #FFD700)'
                 }}
               />
-              TrendThreads
+              ReWear
             </Box>
 
             {/* Desktop Links */}
