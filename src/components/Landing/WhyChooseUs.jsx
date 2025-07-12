@@ -5,25 +5,24 @@ import { motion } from 'framer-motion';
 
 const features = [
   {
-    icon: <SmartToy sx={{ fontSize: 40, color: '#1976d2' }} />,
-    title: 'AI-Powered Recommendations',
-    description: 'Get personalized fashion suggestions tailored to your style.'
+    icon: <SmartToy sx={{ fontSize: 40, color: '#2e7d32' }} />,
+    title: 'Community-Driven Swaps',
+    description: 'Connect with others to trade gently used clothing.'
   },
   {
-    icon: <FlashOn sx={{ fontSize: 40, color: '#1976d2' }} />,
-    title: 'Fast Delivery',
-    description: 'Lightning-fast shipping ensures your outfit arrives on time.'
+    icon: <FlashOn sx={{ fontSize: 40, color: '#2e7d32' }} />,
+    title: 'Point-Based Redemption',
+    description: 'Earn points by listing items and redeem for new-to-you fashion.'
   },
   {
-    icon: <Star sx={{ fontSize: 40, color: '#1976d2' }} />,
-    title: 'Premium Quality',
-    description: 'Every product is made with care and top-notch materials.'
+    icon: <Star sx={{ fontSize: 40, color: '#2e7d32' }} />,
+    title: 'Eco-Conscious Fashion',
+    description: 'Reduce textile waste with every swap.'
   }
 ];
 
-
 const WhyChooseUs = () => (
-  <Box sx={{ py: 8, px: { xs: 4, md: 12 }, background: '#f5f5f5' }}>
+  <Box sx={{ py: 8, px: { xs: 4, md: 12 }, background: '#f1f8e9'}}>
     <motion.div initial={{ opacity:0, y:30 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:0.6 }}>
       <Typography variant="h4" align="center" sx={{ fontWeight: 'bold', mb: 6 }}>
         Why Choose Us?

@@ -11,7 +11,7 @@ const socials = [
 ];
 
 const Footer = () => (
-  <Box sx={{ py: 4, px: { xs: 3, md: 12 }, background: '#1976d2', color: 'white', textAlign: 'center' }}>
+  <Box sx={{ py: 4, px: { xs: 3, md: 12 }, background: '#2e7d32', color: 'white', textAlign: 'center' }}>
     <Box sx={{ mb: 2 }}>
       {socials.map((s, i) => (
         <motion.div whileHover={{ scale: 1.2 }} key={i} style={{ display: 'inline-block' }}>
@@ -21,7 +21,7 @@ const Footer = () => (
         </motion.div>
       ))}
     </Box>
-    <Typography variant="body2">© {new Date().getFullYear()} YourCloth AI. All rights reserved.</Typography>
+    <Typography variant="body2">© {new Date().getFullYear()} ReWear. All rights reserved.</Typography>
   </Box>
 );
 
