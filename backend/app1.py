@@ -5,7 +5,7 @@ import requests
 import random
 from datetime import datetime, timedelta
 
-app = Flask(_name_)
+app = Flask(__name__)
 CORS(app)
 
 USER_IDS = ["auth0|user123", "auth0|user456"]
@@ -123,5 +123,5 @@ def get_purchases():
     filtered = [p for p in PURCHASES if p["user"] == user] if user else PURCHASES
     return jsonify({"purchases": filtered})
 
-if _name_ == "__main__":
+if __name__ == "__main__":
     app.run(debug=True, port=5002)
