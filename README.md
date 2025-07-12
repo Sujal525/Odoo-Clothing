@@ -10,7 +10,7 @@
 
 # 🛍️ ReWear: Sustainable Fashion Through Community Swaps
 
-Welcome to ClothStore — a full-stack MERN application that enables users to browse, add, and purchase clothing items, apply promo codes, and track their order history. It also promotes sustainable shopping by making user experience intuitive and efficient.
+Welcome to ReWear — a full-stack MERN application that enables users to browse, add, and purchase clothing items, apply promo codes, and track their order history. It also promotes sustainable shopping by making user experience intuitive and efficient.
 
 ---
 
