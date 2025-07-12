@@ -27,7 +27,7 @@ export default function ItemDetailPage() {
   useEffect(() => {
     const fetchItem = async () => {
       try {
-        const res = await axios.get(http://localhost:5002/api/items/${id});
+        const res = await axios.get('http://localhost:5002/api/items/${id}');
         setItem(res.data);
       } catch (err) {
         console.error("Failed to fetch item:", err);
@@ -119,7 +119,7 @@ export default function ItemDetailPage() {
                   key={i}
                   component="img"
                   src={img}
-                  alt={Thumb ${i}}
+                  
                   onClick={() => setMainImgIndex(i)}
                   sx={{
                     width: 50,
@@ -145,7 +145,7 @@ export default function ItemDetailPage() {
                 variant="subtitle2"
                 sx={{ color: "#2e7d32", fontWeight: 600 }}
               >
-                ♻️ This product is part of our eco-friendly initiative. Buy second-hand, save the planet.
+                ♻ This product is part of our eco-friendly initiative. Buy second-hand, save the planet.
               </Typography>
             </Box>
           </Box>
