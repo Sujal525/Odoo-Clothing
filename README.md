@@ -8,7 +8,7 @@
 ### Link Of Our Project : https://drive.google.com/file/d/1ZTR8zIl1_7JoD_H5V6iLorODe1IdB8Yv/view?usp=sharing
 
 
-# 🛍️ ClothStore – Sustainable Clothing E-Commerce Platform
+# 🛍️ ReWear: Sustainable Fashion Through Community Swaps
 
 Welcome to ClothStore — a full-stack MERN application that enables users to browse, add, and purchase clothing items, apply promo codes, and track their order history. It also promotes sustainable shopping by making user experience intuitive and efficient.
 
