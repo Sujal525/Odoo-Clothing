@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import LandingPage from './components/Landing/LandingPage';
 import Dashboard from './components/Dashboard';
+import AdminPanel from './components/AdminPanel';
 import CartPage from './components/CartPage';
 import { useAuth0 } from '@auth0/auth0-react';
 import { CartProvider } from './context/CartContext';
@@ -38,6 +39,10 @@ const App = () => {
             <Route
               path="/dashboard"
               element={isAuthenticated ? <Dashboard /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/AgentLogin"
+              element={isAuthenticated ? <AdminPanel /> : <Navigate to="/" />}
             />
             <Route
               path="/cart"

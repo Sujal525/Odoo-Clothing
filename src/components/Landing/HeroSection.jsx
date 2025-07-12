@@ -105,6 +105,15 @@ const HeroSection = () => {
           >
             List an Item
           </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            size="large"
+            sx={{ borderRadius: 3, px: 4, fontWeight: 'bold', color: 'white', borderColor: 'white' }}
+            onClick={() => loginWithRedirect({ appState: { returnTo: '/AgentLogin' } })}
+          >
+            Agent Login
+          </Button>
         </Stack>
       </Box>
     </Box>
