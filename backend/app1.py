@@ -101,11 +101,12 @@ PURCHASES = [
 def get_profile(user_id):
     return jsonify(USER_PROFILES.get(user_id, {"points": 0, "avatar": None}))
 
-@app.route("/api/items", methods=["GET"])
-def get_items():
-    owner = request.args.get("owner")
-    filtered = [p for p in PRODUCTS if p["owner"] == owner] if owner else PRODUCTS
-    return jsonify({"items": filtered})
+@app.route("/api/items/<int:item_id>", methods=["GET"])
+def get_item_by_id(item_id):
+    for p in PRODUCTS:
+        if p["id"] == item_id:
+            return jsonify(p)
+    return jsonify({"error": "Item not found"}), 404
 
 @app.route("/api/swaps", methods=["GET"])
 def get_swaps():
