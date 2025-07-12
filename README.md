@@ -5,7 +5,7 @@
 
 ## Problem StateMent 3 : 👕 ReWear: Sustainable Clothing Exchange Platform
 
-## Link Of Our Project : https://drive.google.com/file/d/1a-x2M692xqWXwwu1oi5vpV6Je8fmvMbq/view?usp=sharing
+## Link Of Our Project : https://drive.google.com/file/d/1ZTR8zIl1_7JoD_H5V6iLorODe1IdB8Yv/view?usp=sharing
 
 
 # 🛍️ ClothStore – Sustainable Clothing E-Commerce Platform
@@ -43,17 +43,20 @@ Welcome to ClothStore — a full-stack MERN application that enables users to br
 ### 🧹 Cart Management
 - Remove individual items or clear the entire cart with one click.
 
+### Admin Panel
+- To approve or deny any suspicious customers , orders and listings. 
+
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer        | Technology         |
-| ------------ | ------------------ |
-| Frontend     | React + MUI        |
-| Backend      | Node.js + Express  |
-| Database     | MongoDB + Mongoose |
-| Auth         | Auth0              |
-| HTTP Client  | Axios              |
+| Layer        | Technology                 |
+| ------------ | ---------------------------|
+| Frontend     | React + MUI                |
+| Backend      | Flask + Node.js + Express  |
+| Database     | MongoDB + Mongoose         |
+| Auth         | Auth0                      |
+| HTTP Client  | Axios                      |
 
 ---
 
@@ -80,25 +83,38 @@ Welcome to ClothStore — a full-stack MERN application that enables users to br
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/clothstore.git
-cd clothstore
+git clone https://github.com/Sujal525/OdooClothing.git
+cd OdooClothing
 ```
 
-### 2. Setup Server
-```bash
-cd server
+### 2. Setup Backend
+```
+1.In First Command Terminal
+cd backend
+python app.py
+```
+
+```
+2.In Second Command Terminal
+cd backend
+python app1.py
+```
+
+```
+3.In Third Command Terminal
+cd backend
 npm install
-touch .env
-# Add MONGO_URI in .env
+node server.js
+```
+
+### 3. Setup Frontend
+```
+4.In Fourth Command Terminal
+npm install
 npm run dev
 ```
 
-### 3. Setup Client
-```bash
-cd client
-npm install
-npm start
-```
+
 
 ---
 
@@ -126,15 +142,6 @@ REACT_APP_AUTH0_CLIENT_ID=<your_auth0_client_id>
 
 ---
 
-## 📸 Screenshots
-
-| Feature               | Preview                |
-|----------------------|------------------------|
-| Cart Page            | 🛒 Add, remove, apply promos |
-| Order Summary        | 💳 Checkout overview   |
-| Purchase History     | 📜 List & clear orders |
-
----
 
 ## 📚 Future Improvements
 
@@ -143,13 +150,7 @@ REACT_APP_AUTH0_CLIENT_ID=<your_auth0_client_id>
 - User feedback & rating system
 - Email confirmation after order placement
 - AI integration for Quality Of Clothes
-- IDM_VITON model for Cloth Simulation
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Fork the repo, create a new branch, and submit a pull request.
+- Deep Learning model for Cloth Overlay on Users
 
 ---
 
@@ -160,6 +161,3 @@ We welcome contributions! Fork the repo, create a new branch, and submit a pull 
 
 ---
 
-## 📄 License
-
-MIT License
