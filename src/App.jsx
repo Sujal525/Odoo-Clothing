@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import LandingPage from './components/Landing/LandingPage';
 import Dashboard from './components/Dashboard';
 import CartPage from './components/CartPage';
-//import AIStylingAssistant from './components/AIStylingAssistant'; // ✅ New import
 import { useAuth0 } from '@auth0/auth0-react';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/Common/Navbar';

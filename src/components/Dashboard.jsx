@@ -1,298 +1,342 @@
 // src/components/Dashboard.jsx
 import React, { useEffect, useState, useContext } from "react";
 import {
-  Box, Typography, Button, Grid, Paper, Card,
-  CardMedia, CardContent, CardActions, Badge, TextField,
-  Tabs, Tab, Modal, Divider, Rating, InputAdornment,
-  MenuItem, Select, FormControl, InputLabel
+  Box,
+  Typography,
+  Avatar,
+  Tabs,
+  Tab,
+  Grid,
+  Card,
+  CardContent,
+  CardMedia,
+  CardActions,
+  Button,
+  CircularProgress,
+  useTheme
 } from "@mui/material";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import SearchIcon from "@mui/icons-material/Search";
-import axios from "axios";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer
+} from "recharts";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { CartContext } from "../context/CartContext";
 
-const CATEGORY_MAP = {
-  Men: "mens-shirts",
-  Women: "womens-dresses",
-  Kids: "tops",
-};
+// Make sure Poppins is loaded globally
+const FONT = "'Poppins', sans-serif";
 
 export default function Dashboard() {
-  const { logout, user } = useAuth0();
-  const navigate = useNavigate();
-  const { cart, addToCart } = useContext(CartContext);
+  const theme = useTheme();
+  const { user, logout, getAccessTokenSilently } = useAuth0();
+  const { cart } = useContext(CartContext);
 
-  const [productsByCategory, setProductsByCategory] = useState({});
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("Men");
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [filter, setFilter] = useState("All");
-  const [priceSort, setPriceSort] = useState("None");
+  const [tabIndex, setTabIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState({ points: 0, avatar: null });
+  const [myItems, setMyItems] = useState([]);
+  const [ongoingSwaps, setOngoingSwaps] = useState([]);
+  const [completedSwaps, setCompletedSwaps] = useState([]);
+  const [purchases, setPurchases] = useState([]);
+  const [swapHistory, setSwapHistory] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const categories = Object.entries(CATEGORY_MAP);
-      const results = {};
-      await Promise.all(
-        categories.map(async ([label, apiName]) => {
-          const res = await axios.get(`https://dummyjson.com/products/category/${apiName}`);
-          results[label] = res.data.products.map((p) => ({
-            ...p,
-            image: p.images[0],
-          }));
-        })
-      );
-      setProductsByCategory(results);
+    const fetchDashboard = async () => {
+      setLoading(true);
+      try {
+        const token = await getAccessTokenSilently();
+        const headers = { Authorization: `Bearer ${token}` };
+        const [pr, it, og, cp, pu] = await Promise.all([
+          axios.get(`/api/users/${user.sub}/profile`, { headers }),
+          axios.get(`/api/items?owner=${user.sub}`, { headers }),
+          axios.get(
+            `/api/swaps?user=${user.sub}&status=pending,in_progress`,
+            { headers }
+          ),
+          axios.get(`/api/swaps?user=${user.sub}&status=completed`, {
+            headers
+          }),
+          axios.get(`/api/purchases?user=${user.sub}`, { headers })
+        ]);
+
+        setProfile(pr.data);
+        setMyItems(it.data.items || []);
+        setOngoingSwaps(og.data.swaps || []);
+        setCompletedSwaps(cp.data.swaps || []);
+        setPurchases(pu.data.purchases || []);
+
+        // simulate 5-day history
+        const today = new Date();
+        const hist = Array.from({ length: 5 }).map((_, i) => {
+          const d = new Date(today);
+          d.setDate(today.getDate() - (4 - i));
+          return {
+            date: d.toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric"
+            }),
+            swaps: Math.floor(Math.random() * 5)
+          };
+        });
+        setSwapHistory(hist);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchData();
-  }, []);
+    fetchDashboard();
+  }, [user, getAccessTokenSilently]);
 
-  useEffect(() => {
-    const search = searchTerm.toLowerCase();
-    if (["men", "man", "m", "me", "gents"].includes(search)) setSelectedCategory("Men");
-    else if (["women", "woman", "w", "wo", "ladies"].includes(search)) setSelectedCategory("Women");
-    else if (["kids", "kid", "boys", "girls", "boy", "girl"].includes(search)) setSelectedCategory("Kids");
-  }, [searchTerm]);
-
-  let filteredProducts = productsByCategory[selectedCategory]?.filter((p) => {
-    const matchSearch =
-      p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchFilter = filter === "All" || p.rating >= parseFloat(filter);
-    return matchSearch && matchFilter;
-  });
-
-  if (priceSort === "low") {
-    filteredProducts = filteredProducts?.sort((a, b) => a.price - b.price);
-  } else if (priceSort === "high") {
-    filteredProducts = filteredProducts?.sort((a, b) => b.price - a.price);
-  }
-
-  return (
-    <Box sx={{ p: { xs: 2, sm: 3 }, backgroundColor: "#f3f4f6", minHeight: "100vh" }}>
-      <Box sx={{
-        mb: 3,
-        display: "flex",
-        flexDirection: { xs: "column", md: "row" },
-        justifyContent: "space-between",
-        alignItems: "center",
-        gap: 2,
-        flexWrap: "wrap"
-      }}>
-        <Typography variant="h4" color="primary">
-          WELCOME!! {user?.name || "Guest"}
-        </Typography>
-
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            alignItems: "center",
-            gap: 2,
-            width: "100%",
-            justifyContent: { xs: "center", md: "flex-end" }
-          }}
-        >
-          <Box sx={{ position: "relative", width: { xs: "100%", sm: 250 } }}>
-            <TextField
-              fullWidth
-              size="small"
-              placeholder={`Search in ${selectedCategory}`}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              sx={{ bgcolor: "white", borderRadius: 2 }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            {searchTerm.trim().length > 0 && (
-              <Paper
-                elevation={3}
-                sx={{
-                  position: "absolute",
-                  top: "100%",
-                  left: 0,
-                  zIndex: 10,
-                  width: "100%",
-                  borderRadius: 1,
-                  maxHeight: 200,
-                  overflowY: "auto",
-                }}
-              >
-                {["Men", "Women", "Kids"].map((cat) => {
-                  const keywords = {
-                    Men: ["men", "man", "gents", "m", "me"],
-                    Women: ["women", "woman", "ladies", "w", "wo"],
-                    Kids: ["kids", "kid", "boys", "girls", "boy", "girl"],
-                  };
-
-                  const isMatch = keywords[cat].some((kw) =>
-                    searchTerm.toLowerCase().startsWith(kw)
-                  );
-
-                  return (
-                    isMatch && (
-                      <MenuItem
-                        key={cat}
-                        onClick={() => {
-                          setSelectedCategory(cat);
-                          setSearchTerm("");
-                        }}
-                      >
-                        Go to {cat}'s Section
-                      </MenuItem>
-                    )
-                  );
-                })}
-              </Paper>
-            )}
-          </Box>
-
-          <FormControl size="small" sx={{ minWidth: 100 }}>
-            <InputLabel>Rating</InputLabel>
-            <Select value={filter} label="Rating" onChange={(e) => setFilter(e.target.value)}>
-              <MenuItem value="All">All</MenuItem>
-              <MenuItem value="4">4 ★ & above</MenuItem>
-              <MenuItem value="3">3 ★ & above</MenuItem>
-            </Select>
-          </FormControl>
-
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Price</InputLabel>
-            <Select value={priceSort} label="Price" onChange={(e) => setPriceSort(e.target.value)}>
-              <MenuItem value="None">Default</MenuItem>
-              <MenuItem value="low">Price: Low to High</MenuItem>
-              <MenuItem value="high">Price: High to Low</MenuItem>
-            </Select>
-          </FormControl>
-
-          <Button onClick={() => navigate("/cart")}>
-            <Badge badgeContent={cart.reduce((a, i) => a + i.quantity, 0)} color="secondary">
-              <ShoppingCartIcon fontSize="large" />
-            </Badge>
-          </Button>
-          <Button variant="contained" color="error" onClick={() => logout({ returnTo: window.location.origin })}>
-            Logout
-          </Button>
-        </Box>
-      </Box>
-
-      <Paper
-        elevation={4}
+  if (loading) {
+    return (
+      <Box
         sx={{
-          background: 'url(https://images.unsplash.com/photo-1542068829-1115f7259450?auto=format&fit=crop&w=1470&q=80)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          color: 'white',
-          p: { xs: 2, sm: 3, md: 4 },
-          mb: 4,
-          borderRadius: 2,
+          height: "80vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
         }}
       >
-        <Typography variant="h3" fontWeight="bold" marginLeft={45} color="dark white">
-          Monsoon Collection 2025
-        </Typography>
-        <Typography variant="h6" mt={2} marginLeft={45} color="dark white">
-          Refresh your wardrobe with the latest arrivals from premium brands.
-        </Typography>
-      </Paper>
+        <CircularProgress size={64} thickness={5} color="success" />
+      </Box>
+    );
+  }
 
-      <Tabs
-        value={selectedCategory}
-        onChange={(e, v) => { setSelectedCategory(v); setSearchTerm(""); }}
-        variant="scrollable"
-        scrollButtons="auto"
-        allowScrollButtonsMobile
-        centered
-        sx={{ mb: 4 }}
+  const stats = [
+    { label: "Items Listed", value: myItems.length },
+    { label: "Ongoing Swaps", value: ongoingSwaps.length },
+    { label: "Completed Swaps", value: completedSwaps.length },
+    { label: "Purchases", value: purchases.length },
+    { label: "Points", value: profile.points }
+  ];
+
+  const TabPanel = ({ idx, children }) =>
+    tabIndex === idx && <Box sx={{ mt: 4 }}>{children}</Box>;
+
+  return (
+    <Box
+      sx={{
+        p: { xs: 2, md: 5 },
+        background: "linear-gradient(145deg, #e8f5e9 0%, #ffffff 70%)",
+        minHeight: "100vh",
+        fontFamily: FONT
+      }}
+    >
+      {/* Hero Card */}
+      <Card
+        sx={{
+          position: "relative",
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          p: 3,
+          borderRadius: 3,
+          background: "#edf7ee",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
+          mb: 5
+        }}
       >
-        {Object.keys(CATEGORY_MAP).map((cat) => (
-          <Tab key={cat} label={cat} value={cat} />
-        ))}
-      </Tabs>
-
-      <Grid container spacing={3}>
-        {filteredProducts?.map((p) => (
-          <Grid item xs={12} sm={6} md={4} key={p.id}>
-            <Card
-              sx={{
-                borderRadius: 4,
-                boxShadow: 4,
-                transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                "&:hover": { transform: "scale(1.02)", boxShadow: 6 },
-                cursor: "pointer",
-                width: "100%",
-                maxWidth: 400,
-                margin: "0 auto"
-              }}
-              onClick={() => setSelectedProduct(p)}
-            >
-              <CardMedia component="img" height="260" image={p.image} alt={p.title} sx={{ borderTopLeftRadius: 4, borderTopRightRadius: 4 }} />
-              <CardContent>
-                <Typography variant="subtitle1" fontWeight="bold" noWrap>{p.title}</Typography>
-                <Typography variant="h6" color="primary">₹{p.price}</Typography>
-                <Rating value={p.rating} size="small" readOnly precision={0.1} />
-              </CardContent>
-              <CardActions>
-                <Button variant="outlined" startIcon={<AddShoppingCartIcon />} onClick={(e) => { e.stopPropagation(); addToCart(p); }}>
-                  Add to Cart
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
-        {filteredProducts?.length === 0 && (
-          <Typography variant="h6" color="text.secondary" sx={{ p: 3 }}>
-            No items found.
-          </Typography>
-        )}
-      </Grid>
-
-      <Modal open={!!selectedProduct} onClose={() => setSelectedProduct(null)}>
+        {/* Buttons Top‑Right */}
         <Box
           sx={{
             position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: { xs: "95%", sm: "90%", md: 600 },
-            maxHeight: "90vh",
-            overflowY: "auto",
-            bgcolor: "background.paper",
-            p: 4,
-            borderRadius: 3,
-            boxShadow: 24,
+            top: 16,
+            right: 16,
+            display: "flex",
+            gap: 1
           }}
         >
-          {selectedProduct && (
-            <>
-              <Typography variant="h5" fontWeight="bold" gutterBottom>{selectedProduct.title}</Typography>
-              <img
-                src={selectedProduct.image}
-                alt={selectedProduct.title}
-                style={{ width: "100%", maxHeight: 300, objectFit: "contain", borderRadius: 8, marginBottom: 16 }}
-              />
-              <Rating value={selectedProduct.rating} readOnly sx={{ mb: 1 }} />
-              <Typography variant="h6" color="primary">₹{selectedProduct.price}</Typography>
-              <Typography paragraph>{selectedProduct.description}</Typography>
-              <Divider sx={{ my: 2 }} />
-              <Typography variant="subtitle1" fontWeight="medium" gutterBottom>Customer Reviews</Typography>
-              <Typography variant="body2" color="text.secondary">⭐ Great product! | ⭐⭐ Good quality | ⭐⭐⭐ Stylish and comfy</Typography>
-              <Divider sx={{ my: 2 }} />
-              <Button variant="contained" fullWidth sx={{ mt: 2 }} onClick={() => { addToCart(selectedProduct); setSelectedProduct(null); }}>
-                Add to Cart
-              </Button>
-            </>
-          )}
+          <Button
+            variant="contained"
+            color="success"
+            sx={{
+              fontFamily: FONT,
+              "&:hover": {
+                boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+                transform: "translateY(-2px)"
+              }
+            }}
+            onClick={() => window.location.assign("/add-item")}
+          >
+            List New Item
+          </Button>
+          <Button
+            variant="outlined"
+            color="success"
+            sx={{
+              fontFamily: FONT,
+              "&:hover": {
+                background: "rgba(76,175,80,0.08)",
+                transform: "translateY(-2px)"
+              }
+            }}
+            onClick={() => logout({ returnTo: window.location.origin })}
+          >
+            Logout
+          </Button>
         </Box>
-      </Modal>
+
+        <Avatar
+          src={profile.avatar || user.picture}
+          sx={{
+            width: 110,
+            height: 110,
+            border: `4px solid ${theme.palette.success.main}`,
+            mr: { md: 4 },
+            mb: { xs: 2, md: 0 }
+          }}
+        />
+        <Box sx={{ flex: 1 }}>
+          <Typography
+            variant="h4"
+            color="success.dark"
+            sx={{ mb: 1, fontFamily: FONT }}
+          >
+            {user.name}
+          </Typography>
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ mb: 2, fontFamily: FONT }}
+          >
+            {user.email}
+          </Typography>
+
+          <Typography
+            variant="subtitle2"
+            color="text.secondary"
+            sx={{ mb: 1, fontFamily: FONT }}
+          >
+            Swap Activity (Last 5 Days)
+          </Typography>
+          <ResponsiveContainer width="100%" height={60}>
+            <LineChart data={swapHistory}>
+              <XAxis dataKey="date" hide />
+              <YAxis hide />
+              <Tooltip
+                contentStyle={{ borderRadius: 8 }}
+                formatter={(v) => [`${v}`, "Swaps"]}
+              />
+              <Line
+                type="monotone"
+                dataKey="swaps"
+                stroke={theme.palette.success.main}
+                strokeWidth={3}
+                dot={{ r: 3 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </Box>
+      </Card>
+
+      {/* Stats Carousel */}
+      <Box
+        sx={{
+          display: "flex",
+          overflowX: "auto",
+          gap: 2,
+          mb: 5,
+          py: 1
+        }}
+      >
+        {stats.map((s) => (
+          <Card
+            key={s.label}
+            sx={{
+              minWidth: 160,
+              flex: "0 0 auto",
+              p: 2,
+              textAlign: "center",
+              borderRadius: 3,
+              background: "#fff",
+              boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
+              transition: "transform 0.2s, box-shadow 0.2s",
+              "&:hover": {
+                transform: "scale(1.05)",
+                boxShadow: "0 12px 24px rgba(0,0,0,0.15)"
+              }
+            }}
+          >
+            <Typography
+              variant="h5"
+              color="success.dark"
+              fontWeight={700}
+              sx={{ fontFamily: FONT }}
+            >
+              {s.value}
+            </Typography>
+            <Typography
+              variant="subtitle2"
+              color="text.secondary"
+              sx={{ fontFamily: FONT }}
+            >
+              {s.label}
+            </Typography>
+          </Card>
+        ))}
+      </Box>
+
+      {/* Tabs */}
+      <Tabs
+        value={tabIndex}
+        onChange={(_, v) => setTabIndex(v)}
+        textColor="success"
+        indicatorColor="success"
+        sx={{
+          mb: 4,
+          ".MuiTabs-indicator": { display: "none" },
+          "& .MuiTab-root": {
+            textTransform: "none",
+            fontWeight: 700,
+            mx: 1,
+            fontFamily: FONT,
+            position: "relative",
+            paddingBottom: 1.5,
+            "&:hover::after": {
+              width: "100%",
+              opacity: 1
+            },
+            "&::after": {
+              content: '""',
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              width: 0,
+              height: 3,
+              bgcolor: theme.palette.success.main,
+              transition: "width 0.3s ease, opacity 0.3s ease",
+              opacity: 0
+            }
+          },
+          "& .Mui-selected::after": {
+            width: "100%",
+            opacity: 1
+          }
+        }}
+      >
+        <Tab label="My Listings" />
+        <Tab label="Ongoing Swaps" />
+        <Tab label="Completed Swaps" />
+        <Tab label="My Purchases" />
+      </Tabs>
+
+      {/* Panels */}
+      <TabPanel idx={0}>
+        {/* My Listings cards with hover… */}
+      </TabPanel>
+      <TabPanel idx={1}>
+        {/* Ongoing Swaps cards with hover… */}
+      </TabPanel>
+      <TabPanel idx={2}>
+        {/* Completed Swaps cards with hover… */}
+      </TabPanel>
+      <TabPanel idx={3}>
+        {/* My Purchases cards with hover… */}
+      </TabPanel>
     </Box>
   );
 }
