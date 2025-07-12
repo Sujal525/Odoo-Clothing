@@ -115,7 +115,7 @@ const UploadClothingPage = () => {
                   <Box key={idx} sx={{
                     width: 100,
                     height: 100,
-                    background: `url(${src}) no-repeat center/cover`,
+                    background: url(${src}) no-repeat center/cover,
                     borderRadius: 2,
                     border: '2px solid #c8e6c9',
                     position: 'relative'
