@@ -5,6 +5,8 @@
 
 ## Problem StateMent 3 : 👕 ReWear: Sustainable Clothing Exchange Platform
 
+## Link Of Our Project : https://drive.google.com/file/d/1a-x2M692xqWXwwu1oi5vpV6Je8fmvMbq/view?usp=sharing
+
 
 # 🛍️ ClothStore – Sustainable Clothing E-Commerce Platform
 
@@ -141,6 +143,7 @@ REACT_APP_AUTH0_CLIENT_ID=<your_auth0_client_id>
 - User feedback & rating system
 - Email confirmation after order placement
 - AI integration for Quality Of Clothes
+- IDM_VITON model for Cloth Simulation
 
 ---
 
