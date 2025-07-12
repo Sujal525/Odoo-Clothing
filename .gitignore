@@ -1,11 +1,14 @@
 # Node modules
 node_modules/
+odenv/
+
 
 # Environment files
 .env
 .env.local
 .env.development
 .env.production
+
 
 # Build output
 dist/
