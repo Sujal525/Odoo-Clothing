@@ -1,7 +1,7 @@
 # Team Name : ShreeNath Innovators
 
-## Team Members : Sujal Dhruve
-##              : Devang Chudasama
+## Team Members : Sujal Dhruve, Devang Chudasama
+               
 
 ## Problem StateMent 3 : 👕 ReWear: Sustainable Clothing Exchange Platform
 
